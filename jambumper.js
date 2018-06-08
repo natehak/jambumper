@@ -20,6 +20,7 @@ bufferLength = analyser.frequencyBinCount;
 var data = new Uint8Array(bufferLength);
 
 var cubes = [];
+let cubeGroup = new THREE.Group();
 var currX = -63;
 for (i = 0; i < bufferLength; i++) {
     geometry = new THREE.BoxGeometry(1, 1, 1);
@@ -29,11 +30,11 @@ for (i = 0; i < bufferLength; i++) {
     currX += 2;
 
     cubes.push(cube);
-    scene.add(cube);
+    cubeGroup.add(cube);
 }
+scene.add(cubeGroup);
 
 camera.position.z = 100;
-camera.position.y = 50;
 
 var directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
 directionalLight.position.x = 1;
@@ -51,15 +52,20 @@ window.addEventListener("keyup", (e) => {
 
 var last = null;
 window.addEventListener("mousedown", (e) => {
-    last = { x: e.clientX, y: e.clientY };
+    if (e.buttons === 2) {
+        last = { x: e.clientX, y: e.clientY };
+    }
 });
 window.addEventListener("mousemove", (e) => {
     if (last !== null) {
         // movement across screen's X axis means we want to rotate across Y axis and vice versa
         degY = (e.clientX - last.x) * TAU / window.innerWidth;
         degX = (e.clientY - last.y) * TAU / window.innerHeight;
-        camera.rotateX(degX);
-        camera.rotateY(degY);
+
+        cubeGroup.rotateY(degY);
+
+        unitX = new THREE.Vector3(1, 0, 0);
+        cubeGroup.rotateOnAxis(cubeGroup.worldToLocal(unitX), degX);
 
         last = { x: e.clientX, y: e.clientY };
     }
@@ -75,25 +81,28 @@ function animate() {
         barHeight = data[i]/2;
         cubes[i].scale.y = barHeight + 0.001;
     }
+    if (keyse["r"]) {
+        cubeGroup.setRotationFromEuler(new THREE.Euler(0, 0, 0));
+    }
     if (keyse["q"]) {
-        yUnit = new THREE.Vector3(0, -5, 0);
-        yUnit.applyQuaternion(camera.quaternion);
-        camera.position.add(yUnit);
-    }
-    if (keyse["e"]) {
-        yUnit = new THREE.Vector3(0, 5, 0);
-        yUnit.applyQuaternion(camera.quaternion);
-        camera.position.add(yUnit);
-    }
-    if (keyse["w"]) {
         zUnit = new THREE.Vector3(0, 0, -5);
         zUnit.applyQuaternion(camera.quaternion);
         camera.position.add(zUnit);
     }
-    if (keyse["s"]) {
+    if (keyse["e"]) {
         zUnit = new THREE.Vector3(0, 0, 5);
         zUnit.applyQuaternion(camera.quaternion);
         camera.position.add(zUnit);
+    }
+    if (keyse["w"]) {
+        yUnit = new THREE.Vector3(0, 5, 0);
+        yUnit.applyQuaternion(camera.quaternion);
+        camera.position.add(yUnit);
+    }
+    if (keyse["s"]) {
+        yUnit = new THREE.Vector3(0, -5, 0);
+        yUnit.applyQuaternion(camera.quaternion);
+        camera.position.add(yUnit);
     }
     if (keyse["a"]) {
         xUnit = new THREE.Vector3(-5, 0, 0);
