@@ -1,4 +1,5 @@
 import * as input from "./input.js";
+import * as audio from "./audio.js";
 
 let PI = 3.141592653589793238;
 let TAU = 2 * PI;
@@ -10,21 +11,10 @@ let renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-let audioCtx = new window.AudioContext();
-let analyser = audioCtx.createAnalyser();
-navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-    let source = audioCtx.createMediaStreamSource(stream);
-    source.connect(analyser);
-});
-
-analyser.fftSize = 256;
-let bufferLength = analyser.frequencyBinCount;
-var data = new Uint8Array(bufferLength);
-
 var cubes = [];
 let cubeGroup = new THREE.Group();
 var currX = -63;
-for (var i = 0; i < bufferLength; i++) {
+for (var i = 0; i < audio.bufferLength; i++) {
     let geometry = new THREE.BoxGeometry(1, 1, 1);
     let material = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
     let cube = new THREE.Mesh(geometry, material);
@@ -44,35 +34,11 @@ directionalLight.position.y = 1;
 directionalLight.position.z = 1;
 scene.add(directionalLight);
 
-var last = null;
-window.addEventListener("mousedown", (e) => {
-    if (e.buttons === 2) {
-        last = { x: e.clientX, y: e.clientY };
-    }
-});
-window.addEventListener("mousemove", (e) => {
-    if (last !== null) {
-        // movement across screen's X axis means we want to rotate across Y axis and vice versa
-        let degY = (e.clientX - last.x) * TAU / window.innerWidth;
-        let degX = (e.clientY - last.y) * TAU / window.innerHeight;
-
-        cubeGroup.rotateY(degY);
-
-        let unitX = new THREE.Vector3(1, 0, 0);
-        cubeGroup.rotateOnAxis(cubeGroup.worldToLocal(unitX), degX);
-
-        last = { x: e.clientX, y: e.clientY };
-    }
-});
-window.addEventListener("mouseup", (e) => {
-    last = null;
-});
-
 function animate() {
     requestAnimationFrame(animate);
-    analyser.getByteFrequencyData(data);
-    for (var i = 0; i < bufferLength; i++) {
-        let barHeight = data[i]/2;
+    audio.onTick();
+    for (var i = 0; i < audio.bufferLength; i++) {
+        let barHeight = audio.fft[i]/2;
         cubes[i].scale.y = barHeight + 0.001;
     }
     if (input.keys["r"]) {
@@ -108,6 +74,18 @@ function animate() {
         xUnit.applyQuaternion(camera.quaternion);
         camera.position.add(xUnit);
     }
+
+    let mouseDelta = input.getMouseDelta();
+    if (input.buttons[input.BUTTON.RIGHT]) {
+        let degY = mouseDelta.x * TAU / window.innerWidth;
+        let degX = mouseDelta.y * TAU / window.innerHeight;
+
+        cubeGroup.rotateY(degY);
+
+        let unitX = new THREE.Vector3(1, 0, 0);
+        cubeGroup.rotateOnAxis(cubeGroup.worldToLocal(unitX), degX);
+    }
+    input.onTick();
 
     renderer.render(scene, camera);
 }
