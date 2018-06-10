@@ -39,10 +39,13 @@ function animate() {
 
     audio.onTick();
 
+    // fft animation
     for (var i = 0; i < audio.bufferLength; i++) {
         let barHeight = audio.fft[i]/2;
         cubes[i].scale.y = barHeight + 0.001;
     }
+
+    // keyboard camera pan
     if (input.keys["r"]) {
         cubeGroup.setRotationFromEuler(new THREE.Euler(0, 0, 0));
     }
@@ -77,6 +80,7 @@ function animate() {
         camera.position.add(xUnit);
     }
 
+    // mouse rotation
     let mouseDelta = input.getMouseDelta();
     if (input.buttons[input.BUTTON.RIGHT]) {
         let degY = mouseDelta.x * TAU / window.innerWidth;
@@ -88,6 +92,7 @@ function animate() {
         cubeGroup.rotateOnAxis(cubeGroup.worldToLocal(unitX), degX);
     }
 
+    // scroll wheel zoom
     let zUnit = new THREE.Vector3(0, 0, input.scrollDelta.y);
     zUnit.applyQuaternion(camera.quaternion);
     camera.position.add(zUnit);
