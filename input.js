@@ -24,11 +24,18 @@ window.addEventListener("mouseup", (e) => {
     buttons[button] = false;
     buttonNum = e.buttons;
 });
-
 export function getMouseDelta() {
     return { x: currentPosition.x - lastPosition.x, y: currentPosition.y - lastPosition.y };
 }
 
+export var scrollDelta = { x: 0.0, y: 0.0 };
+window.addEventListener("wheel", (e) => {
+    scrollDelta.x += e.deltaX;
+    scrollDelta.y += e.deltaY;
+});
+
+
 export function onTick() {
     lastPosition = currentPosition;
+    scrollDelta = { x: 0.0, y: 0.0 };
 }

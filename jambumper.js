@@ -36,7 +36,9 @@ scene.add(directionalLight);
 
 function animate() {
     requestAnimationFrame(animate);
+
     audio.onTick();
+
     for (var i = 0; i < audio.bufferLength; i++) {
         let barHeight = audio.fft[i]/2;
         cubes[i].scale.y = barHeight + 0.001;
@@ -85,6 +87,11 @@ function animate() {
         let unitX = new THREE.Vector3(1, 0, 0);
         cubeGroup.rotateOnAxis(cubeGroup.worldToLocal(unitX), degX);
     }
+
+    let zUnit = new THREE.Vector3(0, 0, input.scrollDelta.y);
+    zUnit.applyQuaternion(camera.quaternion);
+    camera.position.add(zUnit);
+
     input.onTick();
 
     renderer.render(scene, camera);
