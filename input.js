@@ -6,6 +6,9 @@ window.addEventListener("keyup", (e) => {
     keys[e.key] = false;
 });
 
+// disable context menus
+window.addEventListener("contextmenu", (e) => { e.preventDefault(); });
+
 export var lastPosition = { x: 0.0, y: 0.0 };
 export var currentPosition = { x: 0.0, y: 0.0 };
 export var buttons = {};
