@@ -50,11 +50,24 @@ function animate() {
 
     audio.onTick();
 
+    // pointer track mouse
+    let zUnit = new THREE.Vector3(0, 0, 1);
+    let plane = new THREE.Plane(zUnit, pointerDepth);
+    plane.applyMatrix4(cameraGroup.matrix);
+    let localizedMouse = new THREE.Vector2();
+    localizedMouse.x = (input.currentPosition.x / window.innerWidth) * 2 - 1;
+    localizedMouse.y = -(input.currentPosition.y / window.innerHeight) * 2 + 1;
+    raycaster.setFromCamera(localizedMouse, camera);
+    raycaster.ray.intersectPlane(plane, pointer.position);
+
     // fft animation
     for (var i = 0; i < audio.bufferLength; i++) {
         let barHeight = audio.fft[i]/2;
         cubes[i].scale.y = barHeight + 0.001;
     }
+    pointer.scale.x = audio.fft[4]/1000 + 0.001;
+    pointer.scale.y = audio.fft[4]/1000 + 0.001;
+    pointer.scale.z = audio.fft[4]/1000 + 0.001;
 
     // move pointer along z
     if (input.keys["q"]) {
@@ -66,24 +79,16 @@ function animate() {
 
     // keyboard camera pan
     if (input.keys["w"]) {
-        let yUnit = new THREE.Vector3(0, 5, 0);
-        yUnit.applyQuaternion(cameraGroup.quaternion);
-        cameraGroup.position.add(yUnit);
+        cameraGroup.translateY(5);
     }
     if (input.keys["s"]) {
-        let yUnit = new THREE.Vector3(0, -5, 0);
-        yUnit.applyQuaternion(cameraGroup.quaternion);
-        cameraGroup.position.add(yUnit);
+        cameraGroup.translateY(-5);
     }
     if (input.keys["a"]) {
-        let xUnit = new THREE.Vector3(-5, 0, 0);
-        xUnit.applyQuaternion(cameraGroup.quaternion);
-        cameraGroup.position.add(xUnit);
+        cameraGroup.translateX(-5);
     }
     if (input.keys["d"]) {
-        let xUnit = new THREE.Vector3(5, 0, 0);
-        xUnit.applyQuaternion(cameraGroup.quaternion);
-        cameraGroup.position.add(xUnit);
+        cameraGroup.translateX(5);
     }
 
     // reset rotation
@@ -103,19 +108,7 @@ function animate() {
     }
 
     // scroll wheel zoom
-    let zScroll = new THREE.Vector3(0, 0, input.scrollDelta.y);
-    zScroll.applyQuaternion(cameraGroup.quaternion);
-    cameraGroup.position.add(zScroll);
-
-    // pointer track mouse
-    let zUnit = new THREE.Vector3(0, 0, 1);
-    let plane = new THREE.Plane(zUnit, pointerDepth);
-    plane.applyMatrix4(cameraGroup.matrix);
-    let localizedMouse = new THREE.Vector2();
-    localizedMouse.x = (input.currentPosition.x / window.innerWidth) * 2 - 1;
-    localizedMouse.y = -(input.currentPosition.y / window.innerHeight) * 2 + 1;
-    raycaster.setFromCamera(localizedMouse, camera);
-    raycaster.ray.intersectPlane(plane, pointer.position);
+    cameraGroup.translateZ(input.scrollDelta.y);
 
     input.onTick();
 

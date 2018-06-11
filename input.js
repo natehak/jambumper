@@ -21,6 +21,7 @@ window.addEventListener("mousedown", (e) => {
 });
 window.addEventListener("mousemove", (e) => {
     currentPosition = { x: e.clientX, y: e.clientY };
+    console.log(currentPosition);
 });
 window.addEventListener("mouseup", (e) => {
     let button = buttonNum - e.buttons;
