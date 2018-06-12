@@ -7,7 +7,12 @@ let pointer = new THREE.Mesh(
     new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true}));
 var pointerDepth = 20; // relative to camera group coords
 
+// TODO color swapping, mesh swapping, material swapping, motion, scale, different spawners
+
 var didSpawn = false;
+
+let cli = document.getElementById("cli");
+export var typing = false;
 
 let userMeshes = [];
 export let userGroup = new THREE.Group();
@@ -50,3 +55,29 @@ export function onTick(cameraGroup, camera) {
         didSpawn = false;
     }
 }
+
+function execute(cmd) {
+}
+
+// temp hack, if any other modules need typing ability, move this to input.js and provide
+// some sort of callback interface
+window.addEventListener("keypress", (e) => {
+    if (typing) {
+        e.preventDefault();
+        if (e.key === "Enter") {
+            execute(cli.innerHTML);
+            cli.innerHTML = "";
+            typing = false;
+        } else if (e.key === "Backspace") {
+            cli.innerHTML = cli.innerHTML.slice(0, -1);
+        } else if (e.key === "Escape") {
+            cli.innerHTML = "";
+            typing = false;
+        } else {
+            cli.innerHTML += e.key;
+        }
+    }
+    if (!typing && (e.key === " " || e.key === "Enter")) {
+        typing = true;
+    }
+});

@@ -60,37 +60,34 @@ function animate() {
         let barHeight = audio.fft[i]/2;
         cubes[i].scale.y = barHeight + 0.001;
     }
-    /*
-    pointer.scale.x = audio.fft[4]/1000 + 0.001;
-    pointer.scale.y = audio.fft[4]/1000 + 0.001;
-    pointer.scale.z = audio.fft[4]/1000 + 0.001;
-    */
 
-    // move pointer along z
-    if (input.keys["q"]) {
-        pointer.increasePointerDepth(1);
-    }
-    if (input.keys["e"]) {
-        pointer.increasePointerDepth(-1);
-    }
+    if (!pointer.typing) {
+        // move pointer along z
+        if (input.keys["q"]) {
+            pointer.increasePointerDepth(1);
+        }
+        if (input.keys["e"]) {
+            pointer.increasePointerDepth(-1);
+        }
 
-    // keyboard camera pan
-    if (input.keys["w"]) {
-        cameraGroup.translateY(5);
-    }
-    if (input.keys["s"]) {
-        cameraGroup.translateY(-5);
-    }
-    if (input.keys["a"]) {
-        cameraGroup.translateX(-5);
-    }
-    if (input.keys["d"]) {
-        cameraGroup.translateX(5);
-    }
+        // keyboard camera pan
+        if (input.keys["w"]) {
+            cameraGroup.translateY(5);
+        }
+        if (input.keys["s"]) {
+            cameraGroup.translateY(-5);
+        }
+        if (input.keys["a"]) {
+            cameraGroup.translateX(-5);
+        }
+        if (input.keys["d"]) {
+            cameraGroup.translateX(5);
+        }
 
-    // reset rotation
-    if (input.keys["r"]) {
-        cubeGroup.setRotationFromEuler(new THREE.Euler(0, 0, 0));
+        // reset rotation
+        if (input.keys["r"]) {
+            cubeGroup.setRotationFromEuler(new THREE.Euler(0, 0, 0));
+        }
     }
     // mouse rotation
     let mouseDelta = input.getMouseDelta();
