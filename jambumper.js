@@ -1,5 +1,6 @@
 import * as input from "./input.js";
 import * as audio from "./audio.js";
+import * as pointer from "./pointer.js";
 
 let PI = Math.PI;
 let TAU = 2 * PI;
@@ -14,6 +15,7 @@ let renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+/*
 let raycaster = new THREE.Raycaster();
 
 let pointerGeometry = new THREE.SphereBufferGeometry(0.5);
@@ -21,6 +23,9 @@ let pointerMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: 
 let pointer = new THREE.Mesh(pointerGeometry, pointerMaterial);
 let pointerDepth = 20; // relative to camera group coords
 scene.add(pointer);
+*/
+
+pointer.init(scene);
 
 var cubes = [];
 let cubeGroup = new THREE.Group();
@@ -50,31 +55,23 @@ function animate() {
 
     audio.onTick();
 
-    // pointer track mouse
-    let zUnit = new THREE.Vector3(0, 0, 1);
-    let plane = new THREE.Plane(zUnit, pointerDepth);
-    plane.applyMatrix4(cameraGroup.matrix);
-    let localizedMouse = new THREE.Vector2();
-    localizedMouse.x = (input.currentPosition.x / window.innerWidth) * 2 - 1;
-    localizedMouse.y = -(input.currentPosition.y / window.innerHeight) * 2 + 1;
-    raycaster.setFromCamera(localizedMouse, camera);
-    raycaster.ray.intersectPlane(plane, pointer.position);
-
     // fft animation
     for (var i = 0; i < audio.bufferLength; i++) {
         let barHeight = audio.fft[i]/2;
         cubes[i].scale.y = barHeight + 0.001;
     }
+    /*
     pointer.scale.x = audio.fft[4]/1000 + 0.001;
     pointer.scale.y = audio.fft[4]/1000 + 0.001;
     pointer.scale.z = audio.fft[4]/1000 + 0.001;
+    */
 
     // move pointer along z
     if (input.keys["q"]) {
-        pointerDepth += 1;
+        pointer.increasePointerDepth(1);
     }
     if (input.keys["e"]) {
-        pointerDepth -= 1;
+        pointer.increasePointerDepth(-1);
     }
 
     // keyboard camera pan
@@ -102,10 +99,14 @@ function animate() {
         let degX = mouseDelta.y * TAU / window.innerHeight;
 
         cubeGroup.rotateY(degY);
+        pointer.userGroup.rotateY(degY);
 
         let unitX = new THREE.Vector3(1, 0, 0);
         cubeGroup.rotateOnAxis(cubeGroup.worldToLocal(unitX), degX);
+        pointer.userGroup.rotateOnAxis(pointer.userGroup.worldToLocal(unitX), degX);
     }
+
+    pointer.onTick(cameraGroup, camera);
 
     // scroll wheel zoom
     cameraGroup.translateZ(input.scrollDelta.y);
