@@ -1,3 +1,4 @@
+import * as THREE from "./three.module.js";
 import * as input from "./input.js";
 
 let raycaster = new THREE.Raycaster();
@@ -57,6 +58,12 @@ export function onTick(cameraGroup, camera) {
 }
 
 function execute(cmd) {
+    cmd = cmd.trim().toLowerCase().split(/\s\s*/);
+    switch (cmd[0]) {
+        case "color":
+            pointer.material.color.setHex(parseInt(cmd[1], 16));
+            break;
+    }
 }
 
 // temp hack, if any other modules need typing ability, move this to input.js and provide
@@ -77,7 +84,7 @@ window.addEventListener("keypress", (e) => {
             cli.innerHTML += e.key;
         }
     }
-    if (!typing && (e.key === " " || e.key === "Enter")) {
+    else if (!typing && (e.key === " " || e.key === "Enter")) {
         typing = true;
     }
 });

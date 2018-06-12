@@ -1,3 +1,5 @@
+import * as THREE from "./three.module.js";
+
 import * as input from "./input.js";
 import * as audio from "./audio.js";
 import * as pointer from "./pointer.js";
@@ -14,16 +16,6 @@ scene.add(cameraGroup);
 let renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
-
-/*
-let raycaster = new THREE.Raycaster();
-
-let pointerGeometry = new THREE.SphereBufferGeometry(0.5);
-let pointerMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
-let pointer = new THREE.Mesh(pointerGeometry, pointerMaterial);
-let pointerDepth = 20; // relative to camera group coords
-scene.add(pointer);
-*/
 
 pointer.init(scene);
 
