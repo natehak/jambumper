@@ -9,9 +9,7 @@ let TAU = 2 * PI;
 
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-let cameraGroup = new THREE.Group();
-cameraGroup.add(camera);
-scene.add(cameraGroup);
+scene.add(camera);
 
 let renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -34,7 +32,7 @@ for (var i = 0; i < audio.bufferLength; i++) {
 }
 scene.add(cubeGroup);
 
-cameraGroup.position.z = 100;
+camera.position.z = 100;
 
 var directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
 directionalLight.position.x = 1;
@@ -64,21 +62,22 @@ function animate() {
 
         // keyboard camera pan
         if (input.keys["w"]) {
-            cameraGroup.translateY(5);
+            camera.translateY(5);
         }
         if (input.keys["s"]) {
-            cameraGroup.translateY(-5);
+            camera.translateY(-5);
         }
         if (input.keys["a"]) {
-            cameraGroup.translateX(-5);
+            camera.translateX(-5);
         }
         if (input.keys["d"]) {
-            cameraGroup.translateX(5);
+            camera.translateX(5);
         }
 
         // reset rotation
         if (input.keys["r"]) {
             cubeGroup.setRotationFromEuler(new THREE.Euler(0, 0, 0));
+            userGroup.setRotationFromEuler(new THREE.Euler(0, 0, 0));
         }
     }
     // mouse rotation
@@ -95,11 +94,12 @@ function animate() {
         pointer.userGroup.rotateOnAxis(pointer.userGroup.worldToLocal(unitX), degX);
     }
 
-    pointer.onTick(cameraGroup, camera);
 
     // scroll wheel zoom
-    cameraGroup.translateZ(input.scrollDelta.y);
+    camera.translateZ(input.scrollDelta.y);
 
+    camera.updateMatrixWorld(true);
+    pointer.onTick(camera);
     input.onTick();
 
     renderer.render(scene, camera);

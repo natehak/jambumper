@@ -37,11 +37,11 @@ export function increasePointerDepth(f) {
     pointerDepth += f;
 }
 
-export function onTick(cameraGroup, camera) {
+export function onTick(camera) {
     // pointer track mouse
     let zUnit = new THREE.Vector3(0, 0, 1);
     let plane = new THREE.Plane(zUnit, pointerDepth);
-    plane.applyMatrix4(cameraGroup.matrix);
+    plane.applyMatrix4(camera.matrix);
     let localizedMouse = new THREE.Vector2();
     localizedMouse.x = (input.currentPosition.x / window.innerWidth) * 2 - 1;
     localizedMouse.y = -(input.currentPosition.y / window.innerHeight) * 2 + 1;
