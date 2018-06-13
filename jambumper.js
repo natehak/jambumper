@@ -77,7 +77,7 @@ function animate() {
         // reset rotation
         if (input.keys["r"]) {
             cubeGroup.setRotationFromEuler(new THREE.Euler(0, 0, 0));
-            userGroup.setRotationFromEuler(new THREE.Euler(0, 0, 0));
+            pointer.userGroup.setRotationFromEuler(new THREE.Euler(0, 0, 0));
         }
     }
     // mouse rotation

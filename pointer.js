@@ -8,7 +8,7 @@ let pointer = new THREE.Mesh(
     new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true}));
 var pointerDepth = 20; // relative to camera group coords
 
-// TODO color swapping, mesh swapping, material swapping, motion, scale, different spawners
+// TODO mesh swapping, material swapping, motion, scale, different spawners
 
 var didSpawn = false;
 
@@ -17,6 +17,26 @@ export var typing = false;
 
 let userMeshes = [];
 export let userGroup = new THREE.Group();
+
+let commands = {
+    "commands": () => cli.innerHTML = Object.keys(commands).join("\n"),
+
+    "red": () => changePointerColor(0xff0000),
+    "blue": () => changePointerColor(0x0000ff),
+    "green": () => changePointerColor(0x00ff00),
+    "white": () => changePointerColor(0xffffff),
+    "black": () => changePointerColor(0x000000),
+    "yellow": () => changePointerColor(0xffff00),
+    "purple": () => changePointerColor(0xff00ff),
+    "cyan": () => changePointerColor(0x00ffff),
+
+    "cube": () => pointer.geometry = new THREE.BoxBufferGeometry(),
+    "sphere": () => pointer.geometry = new THREE.SphereBufferGeometry()
+};
+
+function changePointerColor(color) {
+    pointer.material.color.setHex(color);
+}
 
 function spawn() {
     let mat = pointer.material.clone();
@@ -61,8 +81,10 @@ function execute(cmd) {
     cmd = cmd.trim().toLowerCase().split(/\s\s*/);
     switch (cmd[0]) {
         case "color":
-            pointer.material.color.setHex(parseInt(cmd[1], 16));
+            changePointerColor(parseInt(cmd[1], 16));
             break;
+        default:
+            commands[cmd[0]]();
     }
 }
 
@@ -72,9 +94,10 @@ window.addEventListener("keypress", (e) => {
     if (typing) {
         e.preventDefault();
         if (e.key === "Enter") {
-            execute(cli.innerHTML);
+            let cmd = cli.innerHTML;
             cli.innerHTML = "";
             typing = false;
+            execute(cmd);
         } else if (e.key === "Backspace") {
             cli.innerHTML = cli.innerHTML.slice(0, -1);
         } else if (e.key === "Escape") {
@@ -83,8 +106,8 @@ window.addEventListener("keypress", (e) => {
         } else {
             cli.innerHTML += e.key;
         }
-    }
-    else if (!typing && (e.key === " " || e.key === "Enter")) {
+    } else if (!typing && (e.key === " " || e.key === "Enter")) {
+        cli.innerHTML = "";
         typing = true;
     }
 });
