@@ -70,9 +70,6 @@ let commands = {
             new THREE.MeshPhongMaterial({ color: pointer.material.color, wireframe: true }),
     "physical": (args) =>
         pointer.material =
-            new THREE.MeshPhysicalMaterial({ color: pointer.material.color, wireframe: true }),
-    "physical": (args) =>
-        pointer.material =
             new THREE.MeshStandardMaterial({ color: pointer.material.color, wireframe: true }),
     "toon": (args) =>
         pointer.material =
@@ -132,8 +129,6 @@ function execute(cmd) {
     commands[cmd[0]](cmd.slice(1));
 }
 
-// temp hack, if any other modules need typing ability, move this to input.js and provide
-// some sort of callback interface
 var historyLoc = -1;
 var history = [];
 window.addEventListener("keypress", (e) => {
