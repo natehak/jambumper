@@ -97,7 +97,7 @@ let commands = {
         let z = args[0].includes("z") ? parseFloat(args[1]) : -1;
         pointerOnTick.push(fftGen(x, y, z));
     },
-    "stretch": (args) => {
+    "scale": (args) => {
         let x = args[0].includes("x") ? parseFloat(args[1]) : 1;
         let y = args[0].includes("y") ? parseFloat(args[1]) : 1;
         let z = args[0].includes("z") ? parseFloat(args[1]) : 1;
@@ -118,6 +118,10 @@ let commands = {
         pointerOnTick.length = 0;
         pointer.setRotationFromEuler(new THREE.Euler(0, 0, 0));
         pointerOnTick.push(reset);
+    },
+    "pop": (args) => {
+        pointerOnTick.pop();
+        pointer.setRotationFromEuler(new THREE.Euler(0, 0, 0));
     },
 };
 

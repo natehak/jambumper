@@ -9,6 +9,8 @@ import * as cli from "./cli.js";
 let PI = Math.PI;
 let TAU = 2 * PI;
 
+let PAN_SPEED = 2;
+
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 scene.add(camera);
@@ -57,24 +59,24 @@ function animate() {
     if (!cli.typing) {
         // zoom
         if (input.keys["q"]) {
-            camera.translateZ(-5);
+            camera.translateZ(-PAN_SPEED);
         }
         if (input.keys["e"]) {
-            camera.translateZ(5);
+            camera.translateZ(PAN_SPEED);
         }
 
         // keyboard camera pan
         if (input.keys["w"]) {
-            camera.translateY(5);
+            camera.translateY(PAN_SPEED);
         }
         if (input.keys["s"]) {
-            camera.translateY(-5);
+            camera.translateY(-PAN_SPEED);
         }
         if (input.keys["a"]) {
-            camera.translateX(-5);
+            camera.translateX(-PAN_SPEED);
         }
         if (input.keys["d"]) {
-            camera.translateX(5);
+            camera.translateX(PAN_SPEED);
         }
 
         // reset rotation
@@ -94,7 +96,6 @@ function animate() {
 
         let unitX = new THREE.Vector3(1, 0, 0);
         cubeGroup.rotateOnAxis(cubeGroup.worldToLocal(unitX), degX);
-        directionalLight.rotateOnAxis(directionalLight.worldToLocal(unitX), degX);
         userGroup.userGroup.rotateOnAxis(userGroup.userGroup.worldToLocal(unitX), degX);
     }
 
