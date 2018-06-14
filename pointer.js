@@ -1,6 +1,7 @@
 import * as THREE from "./three.module.js";
 import * as input from "./input.js";
 import * as userGroup from "./userGroup.js";
+import {reset} from "./cli.js";
 
 let raycaster = new THREE.Raycaster();
 
@@ -10,10 +11,6 @@ export let pointer = new THREE.Mesh(
 export let pointerOnTick = [reset]; // list of fns that take mesh as an argument
 
 var pointerDepth = 10; // relative to camera group coords
-
-// TODO mesh swapping, material swapping, motion, scale, different spawners, mesh patterns
-// (rings, squares, triangles, polygons, polyhedrons)
-
 var didSpawn = false;
 
 export function init(scene) {

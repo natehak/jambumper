@@ -55,12 +55,12 @@ function animate() {
     }
 
     if (!cli.typing) {
-        // move pointer along z
+        // zoom
         if (input.keys["q"]) {
-            pointer.increasePointerDepth(1);
+            camera.translateZ(-5);
         }
         if (input.keys["e"]) {
-            pointer.increasePointerDepth(-1);
+            camera.translateZ(5);
         }
 
         // keyboard camera pan
@@ -99,8 +99,8 @@ function animate() {
     }
 
 
-    // scroll wheel zoom
-    camera.translateZ(input.scrollDelta.y);
+    // scroll wheel move pointer
+    pointer.increasePointerDepth(-input.scrollDelta.y);
 
     camera.updateMatrixWorld(true);
     pointer.onTick(camera);

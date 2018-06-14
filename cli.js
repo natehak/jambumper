@@ -1,6 +1,8 @@
 import * as THREE from "./three.module.js";
-import {pointer, pointerOnTick} as pointer from "./pointer.js";
+import {pointer, pointerOnTick} from "./pointer.js";
 import * as audio from "./audio.js";
+
+let ORBIT_VEL = .01;
 
 let cli = document.getElementById("cli");
 export var typing = false;
@@ -10,7 +12,7 @@ function changePointerColor(color) {
 }
 
 /* convenience fns */
-function reset(mesh) {
+export function reset(mesh) {
     mesh.scale.x = 1;
     mesh.scale.y = 1;
     mesh.scale.z = 1;
@@ -35,27 +37,45 @@ function fftGen(x, y, z) {
     };
 }
 
+function orbitEulerGen(x, y, z) {
+    return (mesh) => {
+        mesh.rotation.x += x;
+        mesh.rotation.y += y;
+        mesh.rotation.z += z;
+    };
+}
+
+function orbitAxisAngleGen(axis, angle) {
+    var t = 0;
+    return (mesh) => {
+        let oldScale = mesh.scale.clone();
+        mesh.setRotationFromAxisAngle(axis, (angle * t) % (2 * Math.PI));
+        mesh.scale.copy(oldScale);
+        t++;
+    }
+}
+
 let commands = {
     "help": (args) => cli.innerHTML = Object.keys(commands).join("\n"),
 
     "basic": (args) =>
         pointer.material =
-            new THREE.MeshBasicMaterial({ color: pointer.material.color, wireframe: true}),
+            new THREE.MeshBasicMaterial({ color: pointer.material.color, wireframe: true }),
     "lambert": (args) =>
         pointer.material =
-            new THREE.MeshLambertMaterial({ color: pointer.mesh.color, wireframe: true}),
+            new THREE.MeshLambertMaterial({ color: pointer.mesh.color, wireframe: true }),
     "phong": (args) =>
         pointer.material =
-            new THREE.MeshPhongMaterial({ color: pointer.material.color, wireframe: true}),
+            new THREE.MeshPhongMaterial({ color: pointer.material.color, wireframe: true }),
     "physical": (args) =>
         pointer.material =
-            new THREE.MeshPhysicalMaterial({ color: pointer.material.color, wireframe: true}),
+            new THREE.MeshPhysicalMaterial({ color: pointer.material.color, wireframe: true }),
     "physical": (args) =>
         pointer.material =
-            new THREE.MeshStandardMaterial({ color: pointer.material.color, wireframe: true}),
+            new THREE.MeshStandardMaterial({ color: pointer.material.color, wireframe: true }),
     "toon": (args) =>
         pointer.material =
-            new THREE.MeshToonMaterial({ color: pointer.material.color, wireframe: true}),
+            new THREE.MeshToonMaterial({ color: pointer.material.color, wireframe: true }),
 
     "color": (args) => changePointerColor(parseInt(args[0], 16)),
     "red": (args) => changePointerColor(0xff0000),
@@ -83,8 +103,22 @@ let commands = {
         let z = args[0].includes("z") ? parseFloat(args[1]) : 1;
         pointerOnTick.push(stretchGen(x, y, z));
     },
+    "orbit": (args) => {
+        if (args.length == 0) {
+            pointerOnTick.push(orbitEulerGen(ORBIT_VEL, -ORBIT_VEL, 0)); // TODO: Noneuler orbit
+        } else {
+            let x = args[0].includes("x") ? ORBIT_VEL : 0;
+            let y = args[0].includes("y") ? ORBIT_VEL : 0;
+            let z = args[0].includes("z") ? ORBIT_VEL : 0;
+            pointerOnTick.push(orbitEulerGen(x, y, z));
+        }
+    },
 
-    "reset": (args) => { pointerOnTick = [reset] }
+    "reset": (args) => {
+        pointerOnTick.length = 0;
+        pointer.setRotationFromEuler(new THREE.Euler(0, 0, 0));
+        pointerOnTick.push(reset);
+    },
 };
 
 function execute(cmd) {
