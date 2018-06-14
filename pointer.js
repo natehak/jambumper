@@ -1,12 +1,13 @@
 import * as THREE from "./three.module.js";
 import * as input from "./input.js";
 import * as audio from "./audio.js";
+import * as userGroup from "./userGroup.js";
 
 let raycaster = new THREE.Raycaster();
 
 let pointer = new THREE.Mesh(
-    new THREE.SphereBufferGeometry(0.5),
-    new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true}));
+    new THREE.BoxBufferGeometry(),
+    new THREE.MeshToonMaterial({ color: 0x00ffff, wireframe: true}));
 var pointerDepth = 10; // relative to camera group coords
 
 // TODO mesh swapping, material swapping, motion, scale, different spawners, mesh patterns
@@ -16,9 +17,6 @@ var didSpawn = false;
 
 let cli = document.getElementById("cli");
 export var typing = false;
-
-let userMeshOnTicks = []; // mesh --> list of of fns that take mesh as arg
-export let userGroup = new THREE.Group();
 
 let pointerOnTick = [reset]; // list of fns that take mesh as an argument
 
@@ -84,15 +82,15 @@ let commands = {
     "sphere": (args) => pointer.geometry = new THREE.SphereBufferGeometry(),
 
     "fft": (args) => {
-        let x = args[0].includes("x") ? parseInt(args[1], 10) : -1;
-        let y = args[0].includes("y") ? parseInt(args[1], 10) : -1;
-        let z = args[0].includes("z") ? parseInt(args[1], 10) : -1;
+        let x = args[0].includes("x") ? parseFloat(args[1]) : -1;
+        let y = args[0].includes("y") ? parseFloat(args[1]) : -1;
+        let z = args[0].includes("z") ? parseFloat(args[1]) : -1;
         pointerOnTick.push(fftGen(x, y, z));
     },
     "stretch": (args) => {
-        let x = args[0].includes("x") ? parseInt(args[1], 10) : 1;
-        let y = args[0].includes("y") ? parseInt(args[1], 10) : 1;
-        let z = args[0].includes("z") ? parseInt(args[1], 10) : 1;
+        let x = args[0].includes("x") ? parseFloat(args[1]) : 1;
+        let y = args[0].includes("y") ? parseFloat(args[1]) : 1;
+        let z = args[0].includes("z") ? parseFloat(args[1]) : 1;
         pointerOnTick.push(stretchGen(x, y, z));
     },
 
@@ -103,23 +101,8 @@ function changePointerColor(color) {
     pointer.material.color.setHex(color);
 }
 
-function spawn() {
-    let mat = pointer.material.clone();
-    mat.wireframe = false;
-    let mesh = new THREE.Mesh(pointer.geometry.clone(), mat);
-    let meshPos = userGroup.worldToLocal(pointer.position);
-    mesh.position.set(meshPos.x, meshPos.y, meshPos.z);
-    let m = new THREE.Matrix4();
-    m.extractRotation(userGroup.matrix);
-    m.getInverse(m);
-    mesh.setRotationFromMatrix(m);
-    userGroup.add(mesh);
-    userMeshOnTicks.push({ mesh: mesh, onTick: pointerOnTick.slice() });
-}
-
 export function init(scene) {
     scene.add(pointer);
-    scene.add(userGroup);
 }
 
 export function increasePointerDepth(f) {
@@ -139,7 +122,7 @@ export function onTick(camera) {
 
     if (!didSpawn && input.buttons[input.BUTTON.LEFT]) {
         didSpawn = true;
-        spawn();
+        userGroup.spawn(pointer, pointerOnTick);
     }
     if (!input.buttons[input.BUTTON.LEFT]) {
         didSpawn = false;
@@ -147,13 +130,6 @@ export function onTick(camera) {
 
     for (var i = 0; i < pointerOnTick.length; i++) {
         pointerOnTick[i](pointer);
-    }
-    for (var i = 0; i < userMeshOnTicks.length; i++) {
-        let mesh = userMeshOnTicks[i].mesh;
-        let onTicks = userMeshOnTicks[i].onTick;
-        for (var j = 0; j < onTicks.length; j++) {
-            onTicks[j](mesh);
-        }
     }
 }
 

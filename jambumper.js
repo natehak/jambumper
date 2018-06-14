@@ -3,6 +3,7 @@ import * as THREE from "./three.module.js";
 import * as input from "./input.js";
 import * as audio from "./audio.js";
 import * as pointer from "./pointer.js";
+import * as userGroup from "./userGroup.js";
 
 let PI = Math.PI;
 let TAU = 2 * PI;
@@ -16,6 +17,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 pointer.init(scene);
+userGroup.init(scene);
 
 var cubes = [];
 let cubeGroup = new THREE.Group();
@@ -77,7 +79,7 @@ function animate() {
         // reset rotation
         if (input.keys["r"]) {
             cubeGroup.setRotationFromEuler(new THREE.Euler(0, 0, 0));
-            pointer.userGroup.setRotationFromEuler(new THREE.Euler(0, 0, 0));
+            userGroup.userGroup.setRotationFromEuler(new THREE.Euler(0, 0, 0));
         }
     }
     // mouse rotation
@@ -87,11 +89,12 @@ function animate() {
         let degX = mouseDelta.y * TAU / window.innerHeight;
 
         cubeGroup.rotateY(degY);
-        pointer.userGroup.rotateY(degY);
+        userGroup.userGroup.rotateY(degY);
 
         let unitX = new THREE.Vector3(1, 0, 0);
         cubeGroup.rotateOnAxis(cubeGroup.worldToLocal(unitX), degX);
-        pointer.userGroup.rotateOnAxis(pointer.userGroup.worldToLocal(unitX), degX);
+        directionalLight.rotateOnAxis(directionalLight.worldToLocal(unitX), degX);
+        userGroup.userGroup.rotateOnAxis(userGroup.userGroup.worldToLocal(unitX), degX);
     }
 
 
@@ -100,6 +103,7 @@ function animate() {
 
     camera.updateMatrixWorld(true);
     pointer.onTick(camera);
+    userGroup.onTick();
     input.onTick();
 
     renderer.render(scene, camera);
