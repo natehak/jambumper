@@ -1,4 +1,5 @@
 import * as THREE from "./three.module.js";
+import {typing} from "./cli.js";
 
 let userMeshOnTicks = []; // mesh --> list of of fns that take mesh as arg
 export let userGroup = new THREE.Group();
@@ -30,3 +31,9 @@ export function onTick() {
         }
     }
 }
+
+window.addEventListener("keypress", (e) => {
+    if (!typing && e.key === "u") {
+        userGroup.children.pop();
+    }
+});

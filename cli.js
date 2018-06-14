@@ -1,6 +1,7 @@
 import * as THREE from "./three.module.js";
 import {pointer, pointerOnTick} from "./pointer.js";
 import * as audio from "./audio.js";
+import {userGroup} from "./userGroup.js";
 
 let ORBIT_VEL = .01;
 
@@ -123,6 +124,9 @@ let commands = {
         pointerOnTick.pop();
         pointer.setRotationFromEuler(new THREE.Euler(0, 0, 0));
     },
+    "undo": (args) => {
+        userGroup.children.pop();
+    }
 };
 
 function execute(cmd) {
