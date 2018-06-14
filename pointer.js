@@ -28,7 +28,15 @@ function reset(mesh) {
     mesh.scale.z = 1;
 }
 
-function fft_gen(x, y, z) {
+function stretchGen(x, y, z) {
+    return (mesh) => {
+        mesh.scale.x *= x;
+        mesh.scale.y *= y;
+        mesh.scale.z *= z;
+    }
+}
+
+function fftGen(x, y, z) {
     return (mesh) => { 
         mesh.scale.x *= x < 0 ? 1 : audio.fft[x] / 100;
         mesh.scale.x += 0.001;
@@ -68,6 +76,7 @@ let commands = {
     "white": (args) => changePointerColor(0xffffff),
     "black": (args) => changePointerColor(0x000000),
     "yellow": (args) => changePointerColor(0xffff00),
+    "orange": (args) => changePointerColor(0xff5500),
     "purple": (args) => changePointerColor(0xff00ff),
     "cyan": (args) => changePointerColor(0x00ffff),
 
@@ -78,7 +87,13 @@ let commands = {
         let x = args[0].includes("x") ? parseInt(args[1], 10) : -1;
         let y = args[0].includes("y") ? parseInt(args[1], 10) : -1;
         let z = args[0].includes("z") ? parseInt(args[1], 10) : -1;
-        pointerOnTick.push(fft_gen(x, y, z));
+        pointerOnTick.push(fftGen(x, y, z));
+    },
+    "stretch": (args) => {
+        let x = args[0].includes("x") ? parseInt(args[1], 10) : 1;
+        let y = args[0].includes("y") ? parseInt(args[1], 10) : 1;
+        let z = args[0].includes("z") ? parseInt(args[1], 10) : 1;
+        pointerOnTick.push(stretchGen(x, y, z));
     },
 
     "reset": (args) => { pointerOnTick = [reset] }
@@ -94,6 +109,10 @@ function spawn() {
     let mesh = new THREE.Mesh(pointer.geometry.clone(), mat);
     let meshPos = userGroup.worldToLocal(pointer.position);
     mesh.position.set(meshPos.x, meshPos.y, meshPos.z);
+    let m = new THREE.Matrix4();
+    m.extractRotation(userGroup.matrix);
+    m.getInverse(m);
+    mesh.setRotationFromMatrix(m);
     userGroup.add(mesh);
     userMeshOnTicks.push({ mesh: mesh, onTick: pointerOnTick.slice() });
 }
