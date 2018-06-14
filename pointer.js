@@ -42,6 +42,25 @@ function fft_gen(x, y, z) {
 let commands = {
     "help": (args) => cli.innerHTML = Object.keys(commands).join("\n"),
 
+    "basic": (args) =>
+        pointer.material =
+            new THREE.MeshBasicMaterial({ color: pointer.material.color, wireframe: true}),
+    "lambert": (args) =>
+        pointer.material =
+            new THREE.MeshLambertMaterial({ color: pointer.mesh.color, wireframe: true}),
+    "phong": (args) =>
+        pointer.material =
+            new THREE.MeshPhongMaterial({ color: pointer.material.color, wireframe: true}),
+    "physical": (args) =>
+        pointer.material =
+            new THREE.MeshPhysicalMaterial({ color: pointer.material.color, wireframe: true}),
+    "physical": (args) =>
+        pointer.material =
+            new THREE.MeshStandardMaterial({ color: pointer.material.color, wireframe: true}),
+    "toon": (args) =>
+        pointer.material =
+            new THREE.MeshToonMaterial({ color: pointer.material.color, wireframe: true}),
+
     "color": (args) => changePointerColor(parseInt(args[0], 16)),
     "red": (args) => changePointerColor(0xff0000),
     "blue": (args) => changePointerColor(0x0000ff),
