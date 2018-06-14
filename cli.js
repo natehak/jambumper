@@ -3,7 +3,7 @@ import {pointer, pointerOnTick} from "./pointer.js";
 import * as audio from "./audio.js";
 import {userGroup} from "./userGroup.js";
 
-let ORBIT_VEL = .01;
+let ROTATE_VEL = .01;
 
 let cli = document.getElementById("cli");
 export var typing = false;
@@ -38,7 +38,7 @@ function fftGen(x, y, z) {
     };
 }
 
-function orbitEulerGen(x, y, z) {
+function rotateEulerGen(x, y, z) {
     return (mesh) => {
         mesh.rotation.x += x;
         mesh.rotation.y += y;
@@ -46,7 +46,7 @@ function orbitEulerGen(x, y, z) {
     };
 }
 
-function orbitAxisAngleGen(axis, angle) {
+function rotateAxisAngleGen(axis, angle) {
     var t = 0;
     return (mesh) => {
         let oldScale = mesh.scale.clone();
@@ -104,14 +104,14 @@ let commands = {
         let z = args[0].includes("z") ? parseFloat(args[1]) : 1;
         pointerOnTick.push(stretchGen(x, y, z));
     },
-    "orbit": (args) => {
+    "rotate": (args) => {
         if (args.length == 0) {
-            pointerOnTick.push(orbitEulerGen(ORBIT_VEL, -ORBIT_VEL, 0)); // TODO: Noneuler orbit
+            pointerOnTick.push(rotateEulerGen(ROTATE_VEL, -ROTATE_VEL, 0)); // TODO: Noneuler rotate
         } else {
-            let x = args[0].includes("x") ? ORBIT_VEL : 0;
-            let y = args[0].includes("y") ? ORBIT_VEL : 0;
-            let z = args[0].includes("z") ? ORBIT_VEL : 0;
-            pointerOnTick.push(orbitEulerGen(x, y, z));
+            let x = args[0].includes("x") ? ROTATE_VEL : 0;
+            let y = args[0].includes("y") ? ROTATE_VEL : 0;
+            let z = args[0].includes("z") ? ROTATE_VEL : 0;
+            pointerOnTick.push(rotateEulerGen(x, y, z));
         }
     },
 
@@ -124,9 +124,7 @@ let commands = {
         pointerOnTick.pop();
         pointer.setRotationFromEuler(new THREE.Euler(0, 0, 0));
     },
-    "undo": (args) => {
-        userGroup.children.pop();
-    }
+    "undo": (args) => userGroup.children.pop(),
 };
 
 function execute(cmd) {
@@ -136,6 +134,8 @@ function execute(cmd) {
 
 // temp hack, if any other modules need typing ability, move this to input.js and provide
 // some sort of callback interface
+var historyLoc = -1;
+var history = [];
 window.addEventListener("keypress", (e) => {
     if (typing) {
         e.preventDefault();
@@ -143,12 +143,29 @@ window.addEventListener("keypress", (e) => {
             let cmd = cli.innerHTML;
             cli.innerHTML = "";
             typing = false;
+            history.unshift(cmd);
+            historyLoc = -1;
             execute(cmd);
         } else if (e.key === "Backspace") {
             cli.innerHTML = cli.innerHTML.slice(0, -1);
         } else if (e.key === "Escape") {
             cli.innerHTML = "";
+            historyLoc = -1;
             typing = false;
+        } else if (e.key === "ArrowUp") {
+            historyLoc += 1;
+            if (historyLoc >= history.length) {
+                historyLoc -= 1;
+            }
+            cli.innerHTML = history[historyLoc];
+        } else if (e.key === "ArrowDown") {
+            historyLoc -= 1;
+            if (historyLoc < 0) {
+                cli.innerHTML = "";
+                historyLoc = -1;
+            } else {
+                cli.innerHTML = history[historyLoc];
+            }
         } else {
             cli.innerHTML += e.key;
         }
