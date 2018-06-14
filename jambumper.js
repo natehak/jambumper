@@ -4,6 +4,7 @@ import * as input from "./input.js";
 import * as audio from "./audio.js";
 import * as pointer from "./pointer.js";
 import * as userGroup from "./userGroup.js";
+import * as cli from "./cli.js";
 
 let PI = Math.PI;
 let TAU = 2 * PI;
@@ -53,7 +54,7 @@ function animate() {
         cubes[i].scale.y = barHeight + 0.001;
     }
 
-    if (!pointer.typing) {
+    if (!cli.typing) {
         // move pointer along z
         if (input.keys["q"]) {
             pointer.increasePointerDepth(1);
