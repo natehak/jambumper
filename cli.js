@@ -12,6 +12,36 @@ function changePointerColor(color) {
     pointer.material.color.setHex(color);
 }
 
+function normalizeRange(A, B, x) {
+    // from https://math.stackexchange.com/questions/43698/range-scaling-problem
+    return ((-1.0 / (B - A)) * A) + ((1.0 / (B - A)) * x);
+}
+
+/* parametric fns */
+function vecsToParam(vecs) {
+    var len = 0;
+    var intervals = [];
+    for (var i = 1; i < vecs.length; i++) {
+        var toAdd = { start: len, vec1: vecs[i-1], vec2: vecs[i] };
+        len += vecs[i-1].distanceTo(vecs[i]);
+        toAdd.end = len;
+        intervals.push(toAdd);
+    }
+
+    return (t) => {
+        t %= 1.0;
+        for (var i = 0; i < intervals.length; i++) {
+            let interval = intervals[i];
+            if (t >= interval.start || t < interval.end) {
+                let normalizedT = normalizeRange(interval.start, interval.end, t);
+                let toReturn = new THREE.Vector3();
+                toReturn.lerpVectors(interval.vec1, interval.vec2, normalizedT);
+                return toReturn;
+            }
+        }
+    };
+}
+
 /* convenience fns */
 export function reset(mesh) {
     mesh.scale.x = 1;
@@ -24,7 +54,7 @@ function stretchGen(x, y, z) {
         mesh.scale.x *= x;
         mesh.scale.y *= y;
         mesh.scale.z *= z;
-    }
+    };
 }
 
 function fftGen(x, y, z) {

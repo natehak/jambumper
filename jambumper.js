@@ -22,6 +22,12 @@ document.body.appendChild(renderer.domElement);
 pointer.init(scene);
 userGroup.init(scene);
 
+var size = 100000;
+var divisions = 10000;
+
+var gridHelper = new THREE.GridHelper( size, divisions );
+scene.add(gridHelper);
+
 var cubes = [];
 let cubeGroup = new THREE.Group();
 var currX = -63;
@@ -82,6 +88,7 @@ function animate() {
         // reset rotation
         if (input.keys["r"]) {
             cubeGroup.setRotationFromEuler(new THREE.Euler(0, 0, 0));
+            gridHelper.setRotationFromEuler(new THREE.Euler(0, 0, 0));
             userGroup.userGroup.setRotationFromEuler(new THREE.Euler(0, 0, 0));
         }
     }
@@ -92,11 +99,13 @@ function animate() {
         let degX = mouseDelta.y * TAU / window.innerHeight;
 
         cubeGroup.rotateY(degY);
+        gridHelper.rotateY(degY);
         userGroup.userGroup.rotateY(degY);
 
         let unitX = new THREE.Vector3(1, 0, 0);
         cubeGroup.rotateOnAxis(cubeGroup.worldToLocal(unitX), degX);
         userGroup.userGroup.rotateOnAxis(userGroup.userGroup.worldToLocal(unitX), degX);
+        gridHelper.rotateOnAxis(gridHelper.worldToLocal(unitX), degX);
     }
 
 
