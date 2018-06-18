@@ -32,7 +32,7 @@ function vecsToParam(vecs) {
         t %= 1.0;
         for (var i = 0; i < intervals.length; i++) {
             let interval = intervals[i];
-            if (t >= interval.start || t < interval.end) {
+            if (t >= interval.start && t < interval.end) {
                 let normalizedT = normalizeRange(interval.start, interval.end, t);
                 let toReturn = new THREE.Vector3();
                 toReturn.lerpVectors(interval.vec1, interval.vec2, normalizedT);
