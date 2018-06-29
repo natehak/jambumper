@@ -1,16 +1,12 @@
 import * as THREE from "./three.module.js";
-import {pointer, pointerOnTick} from "./pointer.js";
 import * as audio from "./audio.js";
 import {userGroup} from "./userGroup.js";
 
 let ROTATE_VEL = .01;
+let BLINK_SPEED = 30; // in num of ticks
 
 let cli = document.getElementById("cli");
 export var typing = false;
-
-function changePointerColor(color) {
-    pointer.material.color.setHex(color);
-}
 
 function normalizeRange(A, B, x) {
     // from https://math.stackexchange.com/questions/43698/range-scaling-problem
@@ -88,6 +84,11 @@ function rotateAxisAngleGen(axis, angle) {
 
 let commands = {
     "help": (args) => cli.innerHTML = Object.keys(commands).join("\n"),
+};
+
+/*
+let commands = {
+    "help": (args) => cli.innerHTML = Object.keys(commands).join("\n"),
 
     "basic": (args) =>
         pointer.material =
@@ -153,28 +154,31 @@ let commands = {
     },
     "undo": (args) => userGroup.children.pop(),
 };
+*/
 
 function execute(cmd) {
     cmd = cmd.trim().toLowerCase().split(/\s\s*/);
-    commands[cmd[0]](cmd.slice(1));
+    if (cmd[0] in commands) {
+        commands[cmd[0]](cmd.slice(1));
+    }
 }
 
 var historyLoc = -1;
 var history = [];
+var cmd = "";
 window.addEventListener("keypress", (e) => {
     if (typing) {
         e.preventDefault();
         if (e.key === "Enter") {
-            let cmd = cli.innerHTML;
-            cli.innerHTML = "";
             typing = false;
             history.unshift(cmd);
             historyLoc = -1;
             execute(cmd);
+            cmd = "";
         } else if (e.key === "Backspace") {
-            cli.innerHTML = cli.innerHTML.slice(0, -1);
+            cmd = cmd.slice(0, -1);
         } else if (e.key === "Escape") {
-            cli.innerHTML = "";
+            cmd = "";
             historyLoc = -1;
             typing = false;
         } else if (e.key === "ArrowUp") {
@@ -182,20 +186,35 @@ window.addEventListener("keypress", (e) => {
             if (historyLoc >= history.length) {
                 historyLoc -= 1;
             }
-            cli.innerHTML = history[historyLoc];
+            cmd = history[historyLoc];
         } else if (e.key === "ArrowDown") {
             historyLoc -= 1;
             if (historyLoc < 0) {
-                cli.innerHTML = "";
+                cmd = "";
                 historyLoc = -1;
             } else {
-                cli.innerHTML = history[historyLoc];
+                cmd = history[historyLoc];
             }
         } else {
-            cli.innerHTML += e.key;
+            cmd += e.key;
         }
     } else if (!typing && (e.key === " " || e.key === "Enter")) {
-        cli.innerHTML = "";
+        cmd = "";
         typing = true;
     }
 });
+
+var counter = -BLINK_SPEED;
+export function onTick() {
+    cli.innerHTML = cmd;
+    if (typing) {
+        cli.innerHTML = "> " + cli.innerHTML;
+    }
+    if (typing && counter < 0) {
+        cli.innerHTML = cli.innerHTML + "_";
+    }
+    counter += 1;
+    if (counter > BLINK_SPEED) {
+        counter = -BLINK_SPEED;
+    }
+}

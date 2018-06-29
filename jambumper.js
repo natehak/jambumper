@@ -2,7 +2,6 @@ import * as THREE from "./three.module.js";
 
 import * as input from "./input.js";
 import * as audio from "./audio.js";
-import * as pointer from "./pointer.js";
 import * as userGroup from "./userGroup.js";
 import * as cli from "./cli.js";
 
@@ -19,29 +18,7 @@ let renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-pointer.init(scene);
 userGroup.init(scene);
-
-var size = 100000;
-var divisions = 10000;
-
-var gridHelper = new THREE.GridHelper( size, divisions );
-scene.add(gridHelper);
-
-var cubes = [];
-let cubeGroup = new THREE.Group();
-var currX = -63;
-for (var i = 0; i < audio.bufferLength; i++) {
-    let geometry = new THREE.BoxBufferGeometry(1, 1, 1);
-    let material = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
-    let cube = new THREE.Mesh(geometry, material);
-    cube.position.x = currX;
-    currX += 2;
-
-    cubes.push(cube);
-    cubeGroup.add(cube);
-}
-scene.add(cubeGroup);
 
 camera.position.z = 100;
 
@@ -55,12 +32,6 @@ function animate() {
     requestAnimationFrame(animate);
 
     audio.onTick();
-
-    // fft animation
-    for (var i = 0; i < audio.bufferLength; i++) {
-        let barHeight = audio.fft[i]/2;
-        cubes[i].scale.y = barHeight + 0.001;
-    }
 
     if (!cli.typing) {
         // zoom
@@ -87,8 +58,6 @@ function animate() {
 
         // reset rotation
         if (input.keys["r"]) {
-            cubeGroup.setRotationFromEuler(new THREE.Euler(0, 0, 0));
-            gridHelper.setRotationFromEuler(new THREE.Euler(0, 0, 0));
             userGroup.userGroup.setRotationFromEuler(new THREE.Euler(0, 0, 0));
         }
     }
@@ -98,23 +67,16 @@ function animate() {
         let degY = mouseDelta.x * TAU / window.innerWidth;
         let degX = mouseDelta.y * TAU / window.innerHeight;
 
-        cubeGroup.rotateY(degY);
-        gridHelper.rotateY(degY);
         userGroup.userGroup.rotateY(degY);
 
         let unitX = new THREE.Vector3(1, 0, 0);
-        cubeGroup.rotateOnAxis(cubeGroup.worldToLocal(unitX), degX);
         userGroup.userGroup.rotateOnAxis(userGroup.userGroup.worldToLocal(unitX), degX);
-        gridHelper.rotateOnAxis(gridHelper.worldToLocal(unitX), degX);
     }
 
 
-    // scroll wheel move pointer
-    pointer.increasePointerDepth(-input.scrollDelta.y);
-
     camera.updateMatrixWorld(true);
-    pointer.onTick(camera);
     userGroup.onTick();
+    cli.onTick();
     input.onTick();
 
     renderer.render(scene, camera);
