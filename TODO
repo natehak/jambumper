@@ -1,7 +1,7 @@
 TODO
 
-- patterns (parametrics, multi vector lerps, faster, slower, more, less, all current modifier should work)
-- more meshes
-- more materials
-- increase interactions
-- instructions
+- colors
+- materials
+- rotation
+- metapaths
+- fft
