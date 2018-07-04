@@ -1,21 +1,8 @@
-# Basic
-
-- WASD to dolly camera up/left/down/right respectively
-
-- Q and E to dolly camera in and out respectively
-
-- click to place new object at pointer
-
-- U to undo placement
-
-- right click and drag to rotate scene
-
-- space to start typing in a command
-
-- enter to submit command
-
-
 # Commands
+
+- Change speed of meshes: `faster`, `slower`
+
+- Add or remove meshes: `more`, `less`
 
 - Colors change color of object: `red`, `blue`, `green`, `white`, `black`, `yellow`, `orange`,
   `purple`, `cyan`
