@@ -50,6 +50,13 @@ let path = vecsToParam([
 
 let numMeshes = 0;
 let cycleTime = 5000.0; // time in ms for path to complete
+
+export function doubleMeshes() {
+    return adjustNumMeshes(numMeshes);
+}
+export function halfMeshes() {
+    return adjustNumMeshes(-Math.floor(numMeshes/2));
+}
 export function adjustNumMeshes(n) {
     return n > 0 ? more(n) : less(n);
 }
