@@ -102,12 +102,12 @@ function baseClone() {
 
 let base = baseClone();
 let path = vecsToParam([
-    new THREE.Vector3(-5, 0, -8),
-    new THREE.Vector3(0, -5, -10),
-    new THREE.Vector3(5, 0, -8),
-    new THREE.Vector3(0, 5, -10),
-    new THREE.Vector3(0, 0, -20),
-    new THREE.Vector3(-5, 0, -8)
+    new THREE.Vector3(-5, 0, 0),
+    new THREE.Vector3(0, -5, -5),
+    new THREE.Vector3(5, 0, 0),
+    new THREE.Vector3(0, 5, -5),
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(-5, 0, 0)
 ]);
 let upperPath = vecsToParam([
     new THREE.Vector3(-10, 0, -8),
@@ -119,10 +119,9 @@ let upperPath = vecsToParam([
 ]);
 
 let lower = new Pathoid(base, path, 10, 5000.0)
-let topPathoid = new Pathoid(lower, upperPath, 3, 5000.0)
+export let topPathoid = new Pathoid(lower, path, 3, 5000.0)
 
 export function onInit(scene) {
-    topPathoid.obj3d.position.z -= 10;
     scene.add(topPathoid.obj3d);
 }
 
