@@ -118,7 +118,14 @@ let upperPath = vecsToParam([
     new THREE.Vector3(-10, 0, -8)
 ]);
 
-let lower = new Pathoid(base, path, 10, 5000.0)
+function genCircleParam(r) {
+    return (t) => {
+        let rad = t * 2 * Math.PI;
+        return new THREE.Vector3(r * Math.cos(rad), r * Math.sin(rad), 0);
+    };
+}
+
+let lower = new Pathoid(base, genCircleParam(3), 5, 5000.0)
 export let topPathoid = new Pathoid(lower, path, 3, 5000.0)
 
 export function onInit(scene) {
