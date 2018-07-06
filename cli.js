@@ -14,8 +14,8 @@ let commands = {
     "slower": (args) => gfx.slower(1000.0),
     "faster": (args) => gfx.slower(-1000.0),
 
-    "more": (args) => gfx.doubleMeshes(),
-    "less": (args) => gfx.halfMeshes(),
+    "more": (args) => gfx.doubleChildren(),
+    "less": (args) => gfx.halfChildren(),
 
     "up": (args) => gfx.up(),
 };

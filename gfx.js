@@ -31,77 +31,21 @@ function vecsToParam(vecs) {
         }
     };
 }
-/*
 
-let template = new THREE.Mesh(
-    new THREE.BoxBufferGeometry(),
-    new THREE.MeshPhysicalMaterial({ color: 0xff00ff })
-);
-
-let baseGroup = new THREE.Group();
-*/
-
-let upperPath = vecsToParam([
-    new THREE.Vector3(-10, 0, -8),
-    new THREE.Vector3(0, -10, -10),
-    new THREE.Vector3(10, 0, -8),
-    new THREE.Vector3(0, 10, -10),
-    new THREE.Vector3(0, 0, -20),
-    new THREE.Vector3(-10, 0, -8)
-]);
-
-/*
-let numMeshes = 0;
-let cycleTime = 5000.0; // time in ms for path to complete
-
-export function doubleMeshes() {
-    return adjustNumMeshes(numMeshes);
-}
-export function halfMeshes() {
-    return adjustNumMeshes(-Math.floor(numMeshes/2));
-}
-export function adjustNumMeshes(n) {
-    return n > 0 ? more(n) : less(n);
+export function slower(t) {
+    topPathoid.cycleTime += t;
+    topPathoid.cycleTime = Math.max(0, topPathoid.cycleTime);
 }
 
-function more(n) {
-    numMeshes += n;
-    for (var i = 0; i < n; i++) {
-        baseGroup.add(template.clone());
-    }
+export function doubleChildren() {
+    return adjustPathoidChildren(topPathoid.numChildren);
 }
-
-function less(n) {
-    numMeshes += n;
-    for (var i = 0; i < Math.abs(n); i++) {
-        baseGroup.remove(baseGroup.children[0]);
-    }
-    numMeshes = Math.max(0, numMeshes);
+export function halfChildren() {
+    return adjustPathoidChildren(-Math.floor(topPathoid.numChildren/2));
 }
-
-export function slower(i) {
-    cycleTime += i;
-    cycleTime = Math.max(1.0, cycleTime);
+export function adjustPathoidChildren(n) {
+    return n > 0 ? topPathoid.more(n) : topPathoid.less(n);
 }
-
-export function onInit(scene) {
-    adjustNumMeshes(13);
-    baseGroup.position.z -= 10;
-    scene.add(baseGroup);
-}
-
-let t = 0.0;
-export function onTick(tDelta) {
-    let u = normalizeRange(0.0, cycleTime, t);
-    for (var i = 0; i < numMeshes; i++) {
-        baseGroup.children[i].position.copy(path(u));
-        u += (1.0 / numMeshes);
-    }
-    baseGroup.position.copy(upperPath(u));
-    t += tDelta;
-    t %= cycleTime;
-}
-*/
 
 function Pathoid(template, path, numChildren, cycleTime) {
     this.template = template;
@@ -134,7 +78,7 @@ function Pathoid(template, path, numChildren, cycleTime) {
     };
     this.less = (n) => {
         this.numChildren += n;
-        for (var i = 0; i < n; i++) {
+        for (var i = 0; i < Math.abs(n); i++) {
             let base = this.subpathoids.pop();
             this.obj3d.remove(base.obj3d);
         }
@@ -165,6 +109,15 @@ let path = vecsToParam([
     new THREE.Vector3(0, 0, -20),
     new THREE.Vector3(-5, 0, -8)
 ]);
+let upperPath = vecsToParam([
+    new THREE.Vector3(-10, 0, -8),
+    new THREE.Vector3(0, -10, -10),
+    new THREE.Vector3(10, 0, -8),
+    new THREE.Vector3(0, 10, -10),
+    new THREE.Vector3(0, 0, -20),
+    new THREE.Vector3(-10, 0, -8)
+]);
+
 let lower = new Pathoid(base, path, 10, 5000.0)
 let topPathoid = new Pathoid(lower, upperPath, 3, 5000.0)
 
