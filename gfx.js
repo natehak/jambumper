@@ -31,6 +31,7 @@ function vecsToParam(vecs) {
         }
     };
 }
+/*
 
 let template = new THREE.Mesh(
     new THREE.BoxBufferGeometry(),
@@ -38,16 +39,18 @@ let template = new THREE.Mesh(
 );
 
 let baseGroup = new THREE.Group();
+*/
 
-let path = vecsToParam([
-    new THREE.Vector3(-5, 0, -8),
-    new THREE.Vector3(0, -5, -10),
-    new THREE.Vector3(5, 0, -8),
-    new THREE.Vector3(0, 5, -10),
+let upperPath = vecsToParam([
+    new THREE.Vector3(-10, 0, -8),
+    new THREE.Vector3(0, -10, -10),
+    new THREE.Vector3(10, 0, -8),
+    new THREE.Vector3(0, 10, -10),
     new THREE.Vector3(0, 0, -20),
-    new THREE.Vector3(-5, 0, -8)
+    new THREE.Vector3(-10, 0, -8)
 ]);
 
+/*
 let numMeshes = 0;
 let cycleTime = 5000.0; // time in ms for path to complete
 
@@ -83,6 +86,7 @@ export function slower(i) {
 
 export function onInit(scene) {
     adjustNumMeshes(13);
+    baseGroup.position.z -= 10;
     scene.add(baseGroup);
 }
 
@@ -93,6 +97,82 @@ export function onTick(tDelta) {
         baseGroup.children[i].position.copy(path(u));
         u += (1.0 / numMeshes);
     }
+    baseGroup.position.copy(upperPath(u));
     t += tDelta;
     t %= cycleTime;
+}
+*/
+
+function Pathoid(template, path, numChildren, cycleTime) {
+    this.template = template;
+    this.subpathoids = [];
+    this.path = path;
+    this.numChildren = 0;
+    this.cycleTime = cycleTime;
+    this.obj3d = new THREE.Group();
+    this.t = 0.0;
+    this.onTick = (tDelta) => {
+        let u = normalizeRange(0.0, this.cycleTime, this.t);
+        for (var i = 0; i < this.numChildren; i++) {
+            this.obj3d.children[i].position.copy(path(u));
+            u += (1.0 / this.numChildren);
+            this.subpathoids[i].onTick(tDelta);
+        }
+        this.t += tDelta;
+        this.t %= this.cycleTime;
+    };
+    this.clone = () => {
+        return new Pathoid(this.template, this.path, this.numChildren, this.cycleTime);
+    };
+    this.more = (n) => {
+        this.numChildren += n;
+        for (var i = 0; i < n; i++) {
+            let base = this.template.clone();
+            this.subpathoids.push(base);
+            this.obj3d.add(base.obj3d);
+        }
+    };
+    this.less = (n) => {
+        this.numChildren += n;
+        for (var i = 0; i < n; i++) {
+            let base = this.subpathoids.pop();
+            this.obj3d.remove(base.obj3d);
+        }
+    };
+
+    this.more(numChildren);
+}
+
+let baseMesh = new THREE.Mesh(
+    new THREE.BoxBufferGeometry(),
+    new THREE.MeshPhysicalMaterial({ color: 0xff00ff })
+);
+
+function baseClone() {
+    return {
+        obj3d: baseMesh.clone(),
+        onTick: () => {},
+        clone: baseClone,
+    };
+}
+
+let base =  baseClone();
+let path = vecsToParam([
+    new THREE.Vector3(-5, 0, -8),
+    new THREE.Vector3(0, -5, -10),
+    new THREE.Vector3(5, 0, -8),
+    new THREE.Vector3(0, 5, -10),
+    new THREE.Vector3(0, 0, -20),
+    new THREE.Vector3(-5, 0, -8)
+]);
+let lower = new Pathoid(base, path, 10, 5000.0)
+let topPathoid = new Pathoid(lower, upperPath, 3, 5000.0)
+
+export function onInit(scene) {
+    topPathoid.obj3d.position.z -= 10;
+    scene.add(topPathoid.obj3d);
+}
+
+export function onTick(tDelta) {
+    topPathoid.onTick(tDelta);
 }

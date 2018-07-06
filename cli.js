@@ -16,6 +16,8 @@ let commands = {
 
     "more": (args) => gfx.doubleMeshes(),
     "less": (args) => gfx.halfMeshes(),
+
+    "up": (args) => gfx.up(),
 };
 
 function execute(cmd) {
