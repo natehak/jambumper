@@ -5,6 +5,7 @@ import * as cli from "./cli.js";
 import * as gfx from "./gfx.js";
 
 const TAU = Math.PI * 2;
+const ZOOM_SPEED = 0.01;
 
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -57,6 +58,9 @@ function tick(tFrame) {
     if (input.keys["r"] && !cli.typing) {
         gfx.topPathoid.obj3d.setRotationFromEuler(new THREE.Euler(0, 0, 0));
     }
+
+    // "zooming"
+    camera.translateZ(input.scrollDelta.y * tDelta * ZOOM_SPEED);
 
     input.onTick();
 

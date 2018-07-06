@@ -1,5 +1,7 @@
 import * as THREE from "./three.module.js";
 
+const TAU = Math.PI * 2;
+
 function normalizeRange(A, B, x) {
     // from https://math.stackexchange.com/questions/43698/range-scaling-problem
     return ((-1.0 / (B - A)) * A) + ((1.0 / (B - A)) * x);
@@ -89,13 +91,15 @@ function Pathoid(template, path, numChildren, cycleTime) {
 
 let baseMesh = new THREE.Mesh(
     new THREE.BoxBufferGeometry(),
-    new THREE.MeshPhysicalMaterial({ color: 0xff00ff })
+    new THREE.MeshPhysicalMaterial({ color: 0x0000ff })
 );
 
 function baseClone() {
     return {
         obj3d: baseMesh.clone(),
-        onTick: () => {},
+        onTick: (tDelta) => {
+            this.obj3d.rotateOnAxis(new THREE.Vector3(1, 0, 0), TAU / 8000);
+        },
         clone: baseClone,
     };
 }
@@ -120,13 +124,13 @@ let upperPath = vecsToParam([
 
 function genCircleParam(r) {
     return (t) => {
-        let rad = t * 2 * Math.PI;
+        let rad = t * TAU;
         return new THREE.Vector3(r * Math.cos(rad), r * Math.sin(rad), 0);
     };
 }
 
-let lower = new Pathoid(base, genCircleParam(3), 5, 5000.0)
-export let topPathoid = new Pathoid(lower, path, 3, 5000.0)
+export let topPathoid = new Pathoid(base, genCircleParam(5), 10, 5000.0)
+//export let topPathoid = new Pathoid(lower, path, 3, 5000.0)
 
 export function onInit(scene) {
     scene.add(topPathoid.obj3d);
