@@ -100,7 +100,7 @@ function baseClone() {
     };
 }
 
-let base =  baseClone();
+let base = baseClone();
 let path = vecsToParam([
     new THREE.Vector3(-5, 0, -8),
     new THREE.Vector3(0, -5, -10),

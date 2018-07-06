@@ -8,7 +8,8 @@ let cli = document.getElementById("cli");
 export var typing = false;
 
 let commands = {
-    "help": (args) => cmd = Object.keys(commands).join("\n"),
+    "help": (args) =>
+        window.location = "https://github.com/natehak/jambumper/blob/master/INSTRUCTIONS.md",
     "mic": (args) => audio.enable(256),
 
     "slower": (args) => gfx.slower(1000.0),
