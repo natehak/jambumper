@@ -1,6 +1,7 @@
 import * as THREE from "./three.module.js";
 import * as audio from "./audio.js";
 import * as gfx from "./gfx.js";
+import * as main from "./main.js";
 
 let BLINK_SPEED = 500; // in ms
 
@@ -18,7 +19,8 @@ let commands = {
     "more": (args) => gfx.doubleChildren(),
     "less": (args) => gfx.halfChildren(),
 
-    "up": (args) => gfx.up(),
+    "up": (args) => gfx.up(main.scene),
+    "down": (args) => gfx.down(main.scene),
 };
 
 function execute(cmd) {

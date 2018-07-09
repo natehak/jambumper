@@ -7,7 +7,7 @@ import * as gfx from "./gfx.js";
 const TAU = Math.PI * 2;
 const ZOOM_SPEED = 0.01;
 
-let scene = new THREE.Scene();
+export let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.z += 10;
 scene.add(camera);
@@ -50,13 +50,13 @@ function tick(tFrame) {
 
         let unitX = new THREE.Vector3(1, 0, 0);
         let unitY = new THREE.Vector3(0, 1, 0);
-        gfx.topPathoid.obj3d.rotateOnAxis(gfx.topPathoid.obj3d.worldToLocal(unitX), degX);
-        gfx.topPathoid.obj3d.rotateOnAxis(gfx.topPathoid.obj3d.worldToLocal(unitY), degY);
+        gfx.currentTop().obj3d.rotateOnAxis(gfx.currentTop().obj3d.worldToLocal(unitX), degX);
+        gfx.currentTop().obj3d.rotateOnAxis(gfx.currentTop().obj3d.worldToLocal(unitY), degY);
     }
 
     // reset mouse rotation
     if (input.keys["r"] && !cli.typing) {
-        gfx.topPathoid.obj3d.setRotationFromEuler(new THREE.Euler(0, 0, 0));
+        gfx.currentTop().obj3d.setRotationFromEuler(new THREE.Euler(0, 0, 0));
     }
 
     // "zooming"
